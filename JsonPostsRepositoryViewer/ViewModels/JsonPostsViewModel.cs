@@ -9,6 +9,7 @@ using System.ComponentModel;
 using JsonPostsRepositoryService;
 using JsonPostsRepositoryService.Models;
 using JSONPlaceHolder.ViewModels.Converters;
+using System.Windows.Threading;
 
 namespace JSONPlaceHolder.ViewModels
 {
@@ -117,7 +118,9 @@ namespace JSONPlaceHolder.ViewModels
                 //(_getPostCommand as DelegateCommand).RaiseCanExecuteChanged();
                 NotifyPropertyChanged("SelectedJsonPlaceHolder");
                 NotifyPropertyChanged("CopyModeEnabled");
-                RenderPostContentFormat();
+
+                if(value != null)
+                    RenderPostContentFormat();
 
             }
         }
@@ -147,13 +150,22 @@ namespace JSONPlaceHolder.ViewModels
                     t.Result.Count > 0)
                 {
                     //Polulate results, pump up on UI thread
-                    App.Current.Dispatcher.BeginInvoke((Action)delegate()
+                    if (App.Current != null)
                     {
-                        t.Result.ForEach(v=> JsonPosts.Add(v));
+                        App.Current.Dispatcher.BeginInvoke((Action)delegate()
+                        {
+                            t.Result.ForEach(v => JsonPosts.Add(v));
+                            if (JsonPosts != null && JsonPosts.Count > 0)
+                                SelectedJsonPlaceHolder = JsonPosts.FirstOrDefault();
+
+                        });
+                    }
+                    else //Test
+                    {
+                      t.Result.ForEach(v => JsonPosts.Add(v));
                         if (JsonPosts != null && JsonPosts.Count > 0)
                             SelectedJsonPlaceHolder = JsonPosts.FirstOrDefault();
-
-                    });
+                    }
                 }
             });
 
