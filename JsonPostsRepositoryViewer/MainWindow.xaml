@@ -1,0 +1,79 @@
+﻿<Window x:Class="JSONPlaceHolder.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:System="clr-namespace:System;assembly=mscorlib"
+        xmlns:viewmodel="clr-namespace:JSONPlaceHolder.ViewModels"
+        Title="Json Posts" Height="684.166" Width="742.668" WindowState="Maximized" Icon="/JSONPlaceHolder;component/Properties/posts.ico" Background="#FFBAE2F1">
+    <Window.Resources>
+        <ObjectDataProvider x:Key="CopyMode" MethodName="GetValues"
+                            ObjectType="{x:Type System:Enum}">
+            <ObjectDataProvider.MethodParameters>
+                <x:Type TypeName="viewmodel:CopyMode"/>
+            </ObjectDataProvider.MethodParameters>
+        </ObjectDataProvider>
+    </Window.Resources>
+    <!--Main Grid-->
+    <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"></RowDefinition>
+            <RowDefinition Height="450"></RowDefinition>
+            <RowDefinition Height="50"></RowDefinition>
+            <RowDefinition Height="*"></RowDefinition>
+        </Grid.RowDefinitions>
+        <TextBlock Grid.Row="0" HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" Text="JSON Posts" VerticalAlignment="Top"/>
+        
+        <!--Json Posts Data Grid-->
+        <DataGrid Grid.Row="1" SelectionUnit="FullRow" ItemsSource="{Binding JsonPosts}" IsSynchronizedWithCurrentItem="True" SelectedItem="{Binding SelectedJsonPlaceHolder}" AlternatingRowBackground="LightBlue" CanUserSortColumns="True" AutoGenerateColumns="False" Margin="0,20,0,0">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="ID" Width="40" Binding="{Binding Id}" IsReadOnly="True" CanUserSort="True" SortDirection="Ascending"></DataGridTextColumn>
+                <DataGridTextColumn Header="Title" Width="*" Binding="{Binding Title}" IsReadOnly="True" CanUserSort="True" SortDirection="Ascending"></DataGridTextColumn>
+            </DataGrid.Columns>
+        </DataGrid>
+        <StackPanel Orientation="Vertical" Grid.Row="2">
+            <CheckBox Content="Enable Get Post" x:Name="enableGetPost" IsChecked="{Binding EnableGetPost}" HorizontalAlignment="Right" Margin="0,0,5,0"></CheckBox>
+            <!--Get Posts Button-->
+            <Button HorizontalAlignment="Right" Width="60" Command="{Binding GetPostCommand}" Height="25" Margin="0,7,5,0">Get Post</Button>
+        </StackPanel>
+
+        <!--Grid to show current selected Json Post object-->
+        <GroupBox Grid.Row="3" Header="JSON Post Details">
+        <Grid  VerticalAlignment="Stretch" Margin="30,20,0,0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="12*"></RowDefinition>
+                <RowDefinition Height="31*"></RowDefinition>
+            </Grid.RowDefinitions>
+            
+            <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,5">
+                <TextBlock Text="ID:"/>
+                <TextBox Width="61" Height="20" VerticalAlignment="Top"  Text="{Binding SelectedJsonPlaceHolder.Id}" Margin="35,0,0,-1" IsEnabled="False" RenderTransformOrigin="0.82,0.55" HorizontalAlignment="Left"/>
+
+                <TextBlock Text="Title:" Margin="20,0,0,0" Width="29"/>
+                    <TextBox Width="400" Height="20" VerticalAlignment="Top"  Text="{Binding SelectedJsonPlaceHolder.Title}" Margin="18,-1,0,0"/>
+                </StackPanel>
+            <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,1,0,18">
+                <TextBlock Text="User ID:" Margin="0,0,0,25"/>
+                    <TextBox Width="61                          " Height="20" VerticalAlignment="Top"  Text="{Binding SelectedJsonPlaceHolder.UserId}" Margin="9,1,0,0" IsEnabled="False"/>
+
+                    <Grid Margin="20,0,0,-20">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="26*"/>
+                            <RowDefinition Height="45*"/>
+                        </Grid.RowDefinitions>
+                   
+                    <StackPanel Grid.Row="0"  Orientation="Horizontal" >
+                            <TextBlock Text="Mode:"/>
+                            <ComboBox Width="110" Height="20" Margin="12,0,0,0" VerticalAlignment="Top" IsEnabled="{Binding CopyModeEnabled}" ItemsSource="{Binding Source={StaticResource CopyMode}}" SelectedValue="{Binding CopyMode}"/>
+                        </StackPanel>
+                        <StackPanel Grid.Row="1" Orientation="Horizontal">
+                            <TextBlock Text="Content:" Width="45"/>
+                            <TextBox Width="400" VerticalAlignment="Top" Text="{Binding PostContent}" Margin="2,0,0,-4" HorizontalAlignment="Left" Height="44"/>
+                            <TextBlock Text="Body:"  Margin="10,0,0,0"  />
+                            <TextBox Width="400"  VerticalAlignment="Top" Text="{Binding SelectedJsonPlaceHolder.Body}" Margin="10,0,0,0" HorizontalAlignment="Left" Height="44"/>
+                        </StackPanel>
+                    </Grid>
+                    
+                </StackPanel>
+        </Grid>
+        </GroupBox>
+    </Grid>
+</Window>
