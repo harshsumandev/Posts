@@ -59,7 +59,6 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Commands\DelegateCommand.cs" />
-    <Compile Include="Tests\JsonPostsViewModelTest.cs" />
     <Compile Include="ViewModels\Converters\CopyModeConverter.cs" />
     <Compile Include="ViewModels\Enums.cs" />
     <Compile Include="ViewModels\JsonPostsViewModel.cs" />
@@ -115,6 +114,7 @@
       <Name>JsonPostsRepositoryService</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
