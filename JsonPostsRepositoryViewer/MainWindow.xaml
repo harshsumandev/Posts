@@ -28,6 +28,23 @@
                 <DataGridTextColumn Header="ID" Width="40" Binding="{Binding Id}" IsReadOnly="True" CanUserSort="True" SortDirection="Ascending"></DataGridTextColumn>
                 <DataGridTextColumn Header="Title" Width="*" Binding="{Binding Title}" IsReadOnly="True" CanUserSort="True" SortDirection="Ascending"></DataGridTextColumn>
             </DataGrid.Columns>
+            <DataGrid.ContextMenu>
+                <ContextMenu Background="LightBlue">
+                    <MenuItem 
+                        Header="Copy Text"
+                        CommandParameter="{Binding}"
+                        Command="{Binding Path=CopyTextPostCommand}">
+                    </MenuItem>
+                    <MenuItem
+                        Header="Copy Json"
+                        CommandParameter="{Binding}"
+                        Command="{Binding Path=CopyJsonPostCommand}"/>
+                    <MenuItem
+                        Header="Copy HTML"
+                        CommandParameter="{Binding}"
+                        Command="{Binding Path=CopyHtmlPostCommand}"/>
+                </ContextMenu>
+            </DataGrid.ContextMenu>
         </DataGrid>
         <StackPanel Orientation="Vertical" Grid.Row="2">
             <CheckBox Content="Enable Get Post" x:Name="enableGetPost" IsChecked="{Binding EnableGetPost}" HorizontalAlignment="Right" Margin="0,0,5,0"></CheckBox>
@@ -48,31 +65,18 @@
                 <TextBox Width="61" Height="20" VerticalAlignment="Top"  Text="{Binding SelectedJsonPlaceHolder.Id}" Margin="35,0,0,-1" IsEnabled="False" RenderTransformOrigin="0.82,0.55" HorizontalAlignment="Left"/>
 
                 <TextBlock Text="Title:" Margin="20,0,0,0" Width="29"/>
-                    <TextBox Width="400" Height="20" VerticalAlignment="Top"  Text="{Binding SelectedJsonPlaceHolder.Title}" Margin="18,-1,0,0"/>
-                </StackPanel>
-            <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,1,0,18">
+                <TextBox Width="510" Height="20" VerticalAlignment="Top" TextWrapping="Wrap" Text="{Binding SelectedJsonPlaceHolder.Title}" Margin="18,-1,0,0"/>
+           </StackPanel>
+            
+            <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,19">
                 <TextBlock Text="User ID:" Margin="0,0,0,25"/>
-                    <TextBox Width="61                          " Height="20" VerticalAlignment="Top"  Text="{Binding SelectedJsonPlaceHolder.UserId}" Margin="9,1,0,0" IsEnabled="False"/>
-
-                    <Grid Margin="20,0,0,-20">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="26*"/>
-                            <RowDefinition Height="45*"/>
-                        </Grid.RowDefinitions>
-                   
-                    <StackPanel Grid.Row="0"  Orientation="Horizontal" >
-                            <TextBlock Text="Mode:"/>
-                            <ComboBox Width="110" Height="20" Margin="12,0,0,0" VerticalAlignment="Top" IsEnabled="{Binding CopyModeEnabled}" ItemsSource="{Binding Source={StaticResource CopyMode}}" SelectedValue="{Binding CopyMode}"/>
-                        </StackPanel>
-                        <StackPanel Grid.Row="1" Orientation="Horizontal">
-                            <TextBlock Text="Content:" Width="45"/>
-                            <TextBox Width="400" VerticalAlignment="Top" Text="{Binding PostContent}" Margin="2,0,0,-4" HorizontalAlignment="Left" Height="44"/>
-                            <TextBlock Text="Body:"  Margin="10,0,0,0"  />
-                            <TextBox Width="400"  VerticalAlignment="Top" Text="{Binding SelectedJsonPlaceHolder.Body}" Margin="10,0,0,0" HorizontalAlignment="Left" Height="44"/>
-                        </StackPanel>
-                    </Grid>
-                    
+                <TextBox Width="61 " Height="20" VerticalAlignment="Top"  Text="{Binding SelectedJsonPlaceHolder.UserId}" Margin="9,1,0,0" IsEnabled="False"/>
+                <StackPanel  Orientation="Horizontal" Margin="10,0,0,0" HorizontalAlignment="Stretch" >
+                    <TextBlock Text="Content:" Margin="7,0,0,0"/>
+                    <ComboBox Width="110" Height="20" Margin="5,0,0,0" VerticalAlignment="Top" IsEnabled="{Binding CopyModeEnabled}" ItemsSource="{Binding Source={StaticResource CopyMode}}" SelectedValue="{Binding CopyMode}"/>
+                    <TextBox Width="400" VerticalAlignment="Top" TextWrapping="Wrap" Text="{Binding PostContent}" Margin="2,0,0,-4" HorizontalAlignment="Left" Height="80"/>
                 </StackPanel>
+            </StackPanel>
         </Grid>
         </GroupBox>
     </Grid>

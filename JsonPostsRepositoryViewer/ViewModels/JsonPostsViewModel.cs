@@ -10,6 +10,7 @@ using JsonPostsRepositoryService;
 using JsonPostsRepositoryService.Models;
 using JSONPlaceHolder.ViewModels.Converters;
 using System.Windows.Threading;
+using System.Windows;
 
 namespace JSONPlaceHolder.ViewModels
 {
@@ -18,7 +19,7 @@ namespace JSONPlaceHolder.ViewModels
     /// Author : Harsh Suman
     /// 30/07/2016
     /// </summary>
-    public class JsonPostsViewModel : INotifyPropertyChanged
+    public class JsonPostsViewModel : ViewModelBase
     {
         #region Constructor
         /// <summary>
@@ -26,7 +27,7 @@ namespace JSONPlaceHolder.ViewModels
         /// </summary>
         public JsonPostsViewModel()
         {
-            this.PopulateJsonPosts();
+            Initialize();
         }
 
         #endregion
@@ -36,7 +37,10 @@ namespace JSONPlaceHolder.ViewModels
         private JsonPostViewObject _selectedJsonPlaceHolder = null;
 
         private ICommand _getPostCommand = null;
-        public event PropertyChangedEventHandler PropertyChanged;
+        private ICommand _copyTextPostCommand = null;
+        private ICommand _copyJsonPostCommand = null;
+        private ICommand _copyHtmlPostCommand = null;
+        
 
         IJsonPostsRepositoryService _service = null;
         private CopyMode _copyMode = CopyMode.TEXT;
@@ -66,6 +70,54 @@ namespace JSONPlaceHolder.ViewModels
                 }
 
                 return _getPostCommand;
+            }
+        }
+
+        /// <summary>
+        /// Command to get a post as per supplied criteria
+        /// </summary>
+        public ICommand CopyTextPostCommand
+        {
+            get
+            {
+                if (_copyTextPostCommand == null)
+                {
+                    _copyTextPostCommand = new DelegateCommand(CopyText, CanExecuteCopyCommand);
+                }
+
+                return _copyTextPostCommand;
+            }
+        }
+
+        /// <summary>
+        /// Command to get a post as per supplied criteria
+        /// </summary>
+        public ICommand CopyJsonPostCommand
+        {
+            get
+            {
+                if (_copyJsonPostCommand == null)
+                {
+                    _copyJsonPostCommand = new DelegateCommand(CopyJson, CanExecuteCopyCommand);
+                }
+
+                return _copyJsonPostCommand;
+            }
+        }
+
+        /// <summary>
+        /// Command to get a post as per supplied criteria
+        /// </summary>
+        public ICommand CopyHtmlPostCommand
+        {
+            get
+            {
+                if (_copyHtmlPostCommand == null)
+                {
+                    _copyHtmlPostCommand = new DelegateCommand(CopyHtml, CanExecuteCopyCommand);
+                }
+
+                return _copyHtmlPostCommand;
             }
         }
 
@@ -115,9 +167,10 @@ namespace JSONPlaceHolder.ViewModels
             set
             {
                 _selectedJsonPlaceHolder = value;
-                //(_getPostCommand as DelegateCommand).RaiseCanExecuteChanged();
+
                 NotifyPropertyChanged("SelectedJsonPlaceHolder");
                 NotifyPropertyChanged("CopyModeEnabled");
+                EnableCopyContextMenu();
 
                 if(value != null)
                     RenderPostContentFormat();
@@ -134,12 +187,6 @@ namespace JSONPlaceHolder.ViewModels
         /// </summary>
         private void PopulateJsonPosts()
         {
-            //Instantiate the service
-            _service = ServiceManager.Instance.GetService();
-
-            //Get place holders models and add for rendering
-            JsonPosts = new ObservableCollection<JsonPostViewObject>();
-
             //This makes an async call to the service
             Task<List<JsonPostViewObject>>.Factory.StartNew(() =>
             {
@@ -172,18 +219,6 @@ namespace JSONPlaceHolder.ViewModels
         }
 
         /// <summary>
-        /// Raise property change
-        /// </summary>
-        /// <param name="property"></param>
-        private void NotifyPropertyChanged(string property)
-        {
-            if (PropertyChanged != null)
-            {
-                PropertyChanged(this, new PropertyChangedEventArgs(property));
-            }
-        }
-
-        /// <summary>
         /// Just fetch Json Post as per supplied criteria
         /// </summary>
         /// <param name="param"></param>
@@ -201,6 +236,82 @@ namespace JSONPlaceHolder.ViewModels
                     RenderPostContentFormat();
                 }
             }
+        }
+
+        private void EnableCopyContextMenu()
+        {
+            //Enable context Menu Items
+            if (_copyTextPostCommand != null)
+                (_copyTextPostCommand as DelegateCommand).RaiseCanExecuteChanged();
+
+            if (_copyJsonPostCommand != null)
+                (_copyJsonPostCommand as DelegateCommand).RaiseCanExecuteChanged();
+
+            if (_copyHtmlPostCommand != null)
+                (_copyHtmlPostCommand as DelegateCommand).RaiseCanExecuteChanged();
+        }
+
+        /// <summary>
+        /// Copy Text to clipboard
+        /// </summary>
+        /// <param name="param"></param>
+        private void CopyText(object param)
+        {
+            CopyToClipboard(JsonPostsRepositoryService.CopyMode.TEXT);
+        }
+
+        /// <summary>
+        /// Copy Json to Clipboard
+        /// </summary>
+        /// <param name="param"></param>
+        private void CopyJson(object param)
+        {
+            CopyToClipboard(JsonPostsRepositoryService.CopyMode.JSON);
+        }
+
+        /// <summary>
+        /// Copy Html to Clipboard
+        /// </summary>
+        /// <param name="param"></param>
+        private void CopyHtml(object param)
+        {
+            CopyToClipboard(JsonPostsRepositoryService.CopyMode.HTML);
+        }
+
+        private void CopyToClipboard(JsonPostsRepositoryService.CopyMode copyMode)
+        {
+            string text = string.Empty;
+
+            switch (copyMode)
+            {
+                case JsonPostsRepositoryService.CopyMode.JSON:
+                    text = _service.ParseModelData(ViewObjectToModelConverter.Convert(_selectedJsonPlaceHolder),
+                                            JsonPostsRepositoryService.CopyMode.JSON);
+                    break;
+                case JsonPostsRepositoryService.CopyMode.HTML:
+                    text = _service.ParseModelData(ViewObjectToModelConverter.Convert(_selectedJsonPlaceHolder),
+                                            JsonPostsRepositoryService.CopyMode.HTML);
+                    break;
+                default:
+                    text = _service.ParseModelData(ViewObjectToModelConverter.Convert(_selectedJsonPlaceHolder),
+                                            JsonPostsRepositoryService.CopyMode.TEXT);
+                    break;
+            }
+
+            if (!string.IsNullOrWhiteSpace(text))
+                Clipboard.SetText(text);
+
+        }
+
+
+        /// <summary>
+        /// Check whether the command can execute/not
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        private bool CanExecuteCopyCommand(object param)
+        {
+            return (_selectedJsonPlaceHolder != null);
         }
 
         /// <summary>
@@ -223,6 +334,20 @@ namespace JSONPlaceHolder.ViewModels
         }
 
         #endregion
+
+        /// <summary>
+        /// Initializes the view model asnd instantiates dependencies
+        /// </summary>
+        protected override void Initialize()
+        {
+            //Instantiates the service
+            _service = ServiceManager.Instance.GetService();
+
+            //Get place holders models and add for rendering
+            JsonPosts = new ObservableCollection<JsonPostViewObject>();
+
+            this.PopulateJsonPosts();
+        }
 
     }
 }
